@@ -1,0 +1,8 @@
+{
+  "batch": "seal-strip-17",
+  "events": [
+    {"kind":"seal_observation","id":"g17-entry","visit":"V-17","door":"left","checkpoint":"in","at":100,"seal":"NW-00972","condition":"intact"},
+    {"kind":"seal_observation","id":"g17-yard","visit":"V-17","door":"left","checkpoint":"yard","at":150,"seal":"NW-00972","condition":"intact"},
+    {"kind":"seal_observation","id":"g17-exit","visit":"V-17","door":"left","checkpoint":"out","at":200,"seal":"NW-00972","condition":"intact"}
+  ]
+}

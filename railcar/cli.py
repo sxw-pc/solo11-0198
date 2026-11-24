@@ -5,7 +5,7 @@ from pathlib import Path
 import sqlite3
 import sys
 
-from . import accrual, settlement
+from . import accrual, door_seal, settlement
 from .capture import capture
 from .db import DomainError, connect, initialize, reading, require_minute, row, snapshot, visit_at
 from .liability import liability
@@ -54,6 +54,9 @@ def arguments(argv):
         commands.add_parser(command).add_argument("file")
     for command in ("custody", "accrue", "tariff"):
         _as_of(commands.add_parser(command))
+    seal = commands.add_parser("seal-trace")
+    _as_of(seal)
+    seal.add_argument("door")
     for command in ("operations", "liability"):
         _window(commands.add_parser(command))
     commands.add_parser("evidence").add_argument("revision", type=int)
@@ -102,6 +105,8 @@ def _inspect(db, args):
     at = require_minute(args.as_of, "as_of")
     if at < visit["begins"]:
         raise DomainError("as_of precedes the visit window")
+    if args.command == "seal-trace":
+        return door_seal.trace(db, visit, args.door, cutoff, at)
     inspect = accrual.decisions if args.command == "custody" else tariff_at
     return {"cutoff": cutoff, "result": inspect(db, visit, cutoff, at)}
 

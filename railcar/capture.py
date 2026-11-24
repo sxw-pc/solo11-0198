@@ -1,9 +1,11 @@
 """Append evidence through one transaction per offline capture file."""
+from . import door_seal
 from .db import DomainError, current, packed, require_minute, require_text, writing
 
 
 # Scope keys cannot be moved when a field record is corrected.
 LAYOUT = {
+    door_seal.KIND: ("id visit door checkpoint at seal condition", ""),
     "car": ("id", ""),
     "visit": ("id car station gate initial_payer begins ends", ""),
     "mark": ("id label car begins ends active", ""),
@@ -18,6 +20,7 @@ LAYOUT = {
     "tariff": ("id station begins ends free rate", "station"),
 }
 CHOICES = {
+    door_seal.KIND: {"checkpoint": ("in", "yard", "out"), "condition": ("intact", "broken", "missing")},
     "observation": {"phase": ("in", "out"), "side": ("carrier", "yard")},
     "inspection": {"result": ("ready", "rejected")},
     "incident": {"cause": ("equipment", "carrier", "weather")},
@@ -57,6 +60,10 @@ def _append(db, event):
     if set(event) != {"kind", *fields}:
         raise DomainError(f"{kind} fields must be: {field_names}")
     values = [_value(kind, field, event[field]) for field in fields]
+    if kind == door_seal.KIND:
+        door_seal.validate(db, event, current(db))
+        return db.execute("INSERT INTO revision(action, payload) VALUES (?, ?)",
+                          (kind, packed(event))).lastrowid
     if immutable:
         old = db.execute(f"SELECT * FROM {kind} WHERE id = ? ORDER BY rev DESC LIMIT 1",
                          (event["id"],)).fetchone()
