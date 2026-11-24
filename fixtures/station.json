@@ -1,0 +1,26 @@
+{
+  "batch": "station-shift-17",
+  "events": [
+    {"kind":"car","id":"HX-017"},
+    {"kind":"car","id":"HX-071"},
+    {"kind":"visit","id":"V-17","car":"HX-017","station":"NORTH","gate":"NORTH-3","initial_payer":"A","begins":60,"ends":240},
+    {"kind":"mark","id":"carrier-mark","label":"HX017","car":"HX-017","begins":0,"ends":400,"active":true},
+    {"kind":"mark","id":"yard-mark","label":"N17","car":"HX-017","begins":0,"ends":400,"active":true},
+    {"kind":"mark","id":"other-mark","label":"HX071","car":"HX-071","begins":0,"ends":400,"active":true},
+    {"kind":"clock","id":"carrier-shift","device":"R1","raw_from":0,"raw_to":400,"offset":2},
+    {"kind":"clock","id":"yard-shift","device":"Y3","raw_from":0,"raw_to":400,"offset":-1},
+    {"kind":"observation","id":"c-in","visit":"V-17","phase":"in","side":"carrier","device":"R1","raw":98,"label":"HX017","gate":"NORTH-3","active":true},
+    {"kind":"observation","id":"y-in","visit":"V-17","phase":"in","side":"yard","device":"Y3","raw":101,"label":"N17","gate":"NORTH-3","active":true},
+    {"kind":"inspection","id":"empty-check","visit":"V-17","at":185,"result":"ready"},
+    {"kind":"observation","id":"c-out","visit":"V-17","phase":"out","side":"carrier","device":"R1","raw":198,"label":"HX017","gate":"NORTH-3","active":true},
+    {"kind":"observation","id":"y-out","visit":"V-17","phase":"out","side":"yard","device":"Y3","raw":201,"label":"N17","gate":"NORTH-3","active":true},
+    {"kind":"incident","id":"belt-7","visit":"V-17","begins":120,"ends":150,"cause":"equipment"},
+    {"kind":"attestation","incident":"belt-7","incident_rev":14,"side":"yard","decision":"approve"},
+    {"kind":"attestation","incident":"belt-7","incident_rev":14,"side":"carrier","decision":"approve"},
+    {"kind":"capacity","id":"north-roster-3","station":"NORTH","begins":120,"ends":150,"slots":1},
+    {"kind":"handoff","id":"interchange-17","visit":"V-17","outgoing":"A","incoming":"B"},
+    {"kind":"signature","handoff":"interchange-17","handoff_rev":18,"side":"outgoing","at":132,"decision":"accept"},
+    {"kind":"signature","handoff":"interchange-17","handoff_rev":18,"side":"incoming","at":135,"decision":"accept"},
+    {"kind":"tariff","id":"north-base","station":"NORTH","begins":0,"ends":400,"free":20,"rate":10}
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "batch": "north-roster-correction-3",
+  "events": [
+    {"kind":"capacity","id":"north-roster-3","station":"NORTH","begins":120,"ends":150,"slots":0}
+  ]
+}
