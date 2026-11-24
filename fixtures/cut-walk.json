@@ -1,0 +1,8 @@
+{
+  "batch": "cut-physical-walk-17",
+  "events": [
+    {"kind":"car","id":"HX-099"},
+    {"kind":"cut_link","id":"AB-17-71","cut":"CUT-17","first_car":"HX-017","first_end":"B","second_car":"HX-071","second_end":"A","at":150,"state":"latched"},
+    {"kind":"cut_link","id":"BB-71-99","cut":"CUT-17","first_car":"HX-071","first_end":"B","second_car":"HX-099","second_end":"B","at":150,"state":"latched"}
+  ]
+}

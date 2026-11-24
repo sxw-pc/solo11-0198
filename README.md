@@ -53,3 +53,15 @@ python -B -m railcar --db shift.sqlite audit 1
 采录批内任一记录失败会回滚整个批和版本号。修正错误后可以继续使用未提交的批号。不要更改已提交批号的内容。`--cutoff` 只能指定成功批次的尾版本。SQLite 串行化采录、应计和审批写入，重开同一文件可继续操作。重复记录相同场次、截止版本、应计时点会返回同一 run。`audit RUN` 用原始证据重新计算并比较整份结果，退出码 1 表示不一致，输入或事务错误退出码为 2。
 
 过期退补需按当前证据重新 `accrue`、`prepare`、`approve`。已批准退补留在余额中，后续更正对已入账余额再出退补。原账、应计快照和审批均可追查。暂计和冻结账单不能触发退补。
+
+
+## 车钩现场编组采录
+
+`cut_link` 记录同一班次编组 `cut` 的两端实地车号及 A/B 端、UTC 观察分钟、`latched` 或 `open`。同一车钩取最后一次有效观察；同刻不同状态或同端接两车会阻止编组枚举。可从编组的带车号和端标记的自由前端调阅编组顺序和尾端，回读原证据版本。已有台账可先重跑 `init` 创建新表。
+
+```powershell
+python -B -m railcar --db shift.sqlite capture fixtures/cut-walk.json
+python -B -m railcar --db shift.sqlite cut-manifest CUT-17 HX-017 A --as-of 160
+```
+
+样例在 `seed` 后形成 HX-017、HX-071、HX-099 的编组，HX-099 的 B 端朝前。补采打开 71 与 99 之间的车钩后，从原自由前端可回读仅包含前两车的编组。

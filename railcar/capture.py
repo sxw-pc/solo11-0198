@@ -10,6 +10,7 @@ LAYOUT = {
     "clock": ("id device raw_from raw_to offset", "device"),
     "observation": ("id visit phase side device raw label gate active", "visit phase side"),
     "inspection": ("id visit at result", "visit"),
+    "cut_link": ("id cut first_car first_end second_car second_end at state", "cut first_car first_end second_car second_end"),
     "incident": ("id visit begins ends cause", "visit"),
     "attestation": ("incident incident_rev side decision", ""),
     "capacity": ("id station begins ends slots", "station"),
@@ -20,6 +21,7 @@ LAYOUT = {
 CHOICES = {
     "observation": {"phase": ("in", "out"), "side": ("carrier", "yard")},
     "inspection": {"result": ("ready", "rejected")},
+    "cut_link": {"first_end": ("A", "B"), "second_end": ("A", "B"), "state": ("latched", "open")},
     "incident": {"cause": ("equipment", "carrier", "weather")},
     "attestation": {"side": ("carrier", "yard"), "decision": ("approve", "deny")},
     "signature": {"side": ("outgoing", "incoming"), "decision": ("accept", "withdraw")},

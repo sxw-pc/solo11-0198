@@ -7,6 +7,7 @@ import sys
 
 from . import accrual, settlement
 from .capture import capture
+from .cut_manifest import manifest
 from .db import DomainError, connect, initialize, reading, require_minute, row, snapshot, visit_at
 from .liability import liability
 from .operations import assess_operations
@@ -56,6 +57,12 @@ def arguments(argv):
         _as_of(commands.add_parser(command))
     for command in ("operations", "liability"):
         _window(commands.add_parser(command))
+    cut = commands.add_parser("cut-manifest")
+    cut.add_argument("cut")
+    cut.add_argument("front_car")
+    cut.add_argument("front_end", choices=("A", "B"))
+    cut.add_argument("--as-of", type=int, required=True)
+    cut.add_argument("--cutoff", type=int)
     commands.add_parser("evidence").add_argument("revision", type=int)
     commands.add_parser("audit").add_argument("run", type=int)
     commands.add_parser("balance").add_argument("invoice")
@@ -132,6 +139,9 @@ def dispatch(db, args):
             return settlement.balance(db, args.invoice)
         if command == "adjustment":
             return settlement.inspect_adjustment(db, args.id)
+        if command == "cut-manifest":
+            cutoff = snapshot(db, args.cutoff)
+            return {"cutoff": cutoff, "result": manifest(db, args.cut, cutoff, args.as_of, (args.front_car, args.front_end))}
         if command == "evidence":
             item = row(db, "SELECT rev, payload FROM revision WHERE rev = ?", (args.revision,), "revision not found")
             return {"revision": item["rev"], "event": json.loads(item["payload"])}
