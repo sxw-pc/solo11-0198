@@ -35,7 +35,7 @@ class CliTests(unittest.TestCase):
     def test_independent_commands_and_file_backed_audit_survive_restart(self):
         self.assertIn("initialize", self.command("seed", code=2))
         self.assertFalse(self.path.exists())
-        self.assertEqual(self.command("init"), {"schema_version": 1})
+        self.assertEqual(self.command("init"), {"schema_version": 2})
         cutoff = self.command("seed")["last_rev"]
         self.assertTrue(self.command("seed")["replayed"])
         self.assertEqual(self.command("custody", "V-17", "--as-of", "210")["result"]["delivery"]["at"], 100)

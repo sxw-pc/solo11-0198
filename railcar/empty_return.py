@@ -6,6 +6,9 @@ from .delivery import crossing
 def empty_return(db, visit, cutoff, as_of, delivery):
     departure = crossing(db, visit, "out", cutoff, as_of)
     lower = delivery.get("at", visit["begins"])
+    # Only inspections between the real delivery boundary and the real exit
+    # boundary can govern: an inspection at or after the earliest exit reading
+    # is too late to prove the car was empty when it left.
     upper = departure.get("earliest", min(as_of, visit["ends"] - 1))
     inspections = [item for item in versioned(db, "inspection", cutoff, visit=visit["id"])
                    if lower <= item["at"] <= upper]
@@ -25,4 +28,6 @@ def empty_return(db, visit, cutoff, as_of, delivery):
         return {**detail, "status": "rejected"}
     if departure["status"] != "confirmed":
         return {**detail, "status": "tendered", "tender_at": last}
+    # A passing inspection before the earliest exit reading proves the car was
+    # emptied: the proven exit ends the occupation regardless of later evidence.
     return {**detail, "status": "returned", "tender_at": last, "at": departure["at"]}

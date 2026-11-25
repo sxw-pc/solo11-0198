@@ -21,11 +21,14 @@ def connect(path):
 
 def initialize(db):
     version = db.execute("PRAGMA user_version").fetchone()[0]
-    if version not in (0, 1):
+    if version not in (0, 1, 2):
         raise DomainError(f"unsupported schema version {version}")
     if version == 0:
         schema = Path(__file__).with_name("schema.sql").read_text(encoding="utf-8")
         db.executescript("BEGIN IMMEDIATE;\n" + schema + "\nCOMMIT;")
+    elif version == 1:
+        migration = Path(__file__).with_name("migration_1_2.sql").read_text(encoding="utf-8")
+        db.executescript("BEGIN IMMEDIATE;\n" + migration + "\nCOMMIT;")
 
 
 @contextmanager

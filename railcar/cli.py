@@ -11,6 +11,7 @@ from .db import DomainError, connect, initialize, reading, require_minute, row, 
 from .liability import liability
 from .operations import assess_operations
 from .pricing import tariff_at
+from .weighbridge import evaluate_visit, intake
 
 
 FIXTURES = Path(__file__).resolve().parent.parent / "fixtures"
@@ -50,8 +51,9 @@ def arguments(argv):
     commands.add_parser("init", help="initialize the SQLite schema")
     for command in ("seed", "demo"):
         commands.add_parser(command)
-    for command in ("capture", "invoice"):
+    for command in ("capture", "invoice", "weigh", "weigh-preview"):
         commands.add_parser(command).add_argument("file")
+    commands.add_parser("weighing").add_argument("visit")
     for command in ("custody", "accrue", "tariff"):
         _as_of(commands.add_parser(command))
     for command in ("operations", "liability"):
@@ -110,13 +112,17 @@ def dispatch(db, args):
     command = args.command
     if command == "init":
         initialize(db)
-        return {"schema_version": 1}
+        return {"schema_version": 2}
     if command == "seed":
         return seed(db)
     if command == "demo":
         return demo(db)
     if command == "capture":
         return capture(db, load(args.file))
+    if command in ("weigh", "weigh-preview"):
+        return intake(db, load(args.file), preview=(command == "weigh-preview"))
+    if command == "weighing":
+        return {"result": evaluate_visit(db, args.visit)}
     if command == "invoice":
         return settlement.file_invoice(db, load(args.file))
     if command == "accrue":
@@ -146,8 +152,11 @@ def main(argv=None):
         with closing(connect(args.db)) as db:
             if args.command == "demo":
                 initialize(db)
-            elif args.command != "init" and db.execute("PRAGMA user_version").fetchone()[0] != 1:
-                raise DomainError("database does not have a supported initialized schema")
+            elif args.command != "init":
+                version = db.execute("PRAGMA user_version").fetchone()[0]
+                if version not in (1, 2):
+                    raise DomainError("database does not have a supported initialized schema")
+                initialize(db)  # no-op on the current schema; migrates older ledgers
             result = dispatch(db, args)
         print(json.dumps(result, ensure_ascii=True, indent=2, sort_keys=True))
         return int(args.command == "audit" and not result["matches"])
